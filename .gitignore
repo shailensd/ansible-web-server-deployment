@@ -1,0 +1,10 @@
+# Ignore private key files
+*.pem
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore log files and temp files
+*.log
+tmp/

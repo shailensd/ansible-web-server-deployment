@@ -1,0 +1,50 @@
+---
+- name: Deploy Apache Web Server
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+      when: ansible_facts['distribution'] == 'Ubuntu'
+      tags: deploy
+
+    - name: Start Apache service
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+      tags: deploy
+
+    - name: Create a custom index.html file
+      copy:
+        content: "Hello World from SJSU-{{ inventory_hostname[-1] }}"
+        dest: /var/www/html/index.html
+      when: ansible_facts['distribution'] == 'Ubuntu'
+      tags: deploy
+
+- name: Un-deploy Apache Web Server
+  hosts: webservers
+  become: yes
+  tasks:
+    - name: Stop Apache service
+      service:
+        name: apache2
+        state: stopped
+      when: ansible_facts['distribution'] == 'Ubuntu'
+      tags: undeploy
+
+    - name: Remove Apache package
+      apt:
+        name: apache2
+        state: absent
+      when: ansible_facts['distribution'] == 'Ubuntu'
+      tags: undeploy
+
+    - name: Delete the custom index.html file
+      file:
+        path: /var/www/html/index.html
+        state: absent
+      when: ansible_facts['distribution'] == 'Ubuntu'
+      tags: undeploy
